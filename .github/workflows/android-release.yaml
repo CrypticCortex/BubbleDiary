@@ -1,54 +1,41 @@
-# This is a basic workflow to help you get started with Actions
-
-name: Flutter Release CI
+name: Flutter APK
 
 on:
   push:
-    branches: [prod]
+    branches:
+      - master
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: Decode google-services.json
-        env:
-          GOOGLE_SERVICES_JSON: ${{ secrets.googleservices }}
-        run: echo $GOOGLE_SERVICES_JSON > /android/app/google-services.json
-
-      - name: Decode upload-keystore.jks
-        env:
-          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
-        run: echo $KEYSTORE_BASE64 | base64 --decode > android/app/upload-keystore.jks
-
-      - uses: actions/setup-java@v1
+      - name: Setup Java
+        uses: actions/setup-java@v2
         with:
-          java-version: "13.x"
+          java-version: "17.0.10"
+          distribution: "temurin"
 
-      - uses: subosito/flutter-action@v1.5.0
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v1
         with:
-          channel: "stable"
+          flutter-version: "2.0.4"
 
-      - name: Flutter build apk
+      - name: Setup JKS
         env:
-          KEYALIAS: ${{ secrets.KEYALIAS }}
-          STOREPASSWORD: ${{ secrets.STOREPASSWORD }}
-          KEYPASSWORD: ${{ secrets.KEYPASSWORD }}
-        run: |
-          flutter pub get
-          flutter clean
-          flutter build apk
-      - name: Generate release notes
-        id: release_notes
-        run: echo "$(date)" > release-notes.txt
+          JKS_FILE: ${{ secrets.JKS_FILE }}
+        run: echo $JKS_FILE | base64 --decode > ./key.jks
 
-      - name: Upload release assets
-        uses: actions/upload-release-asset@latest
+      - name: Get Packages
+        run: flutter pub get
+
+      - name: Build APK
+        run: flutter build apk --split-per-abi --release --key-store-path=./key.jks --key-store-password=${{ secrets.KEY_STORE_PASSWORD }} --key-alias=${{ secrets.KEY_ALIAS }} --key-password=${{ secrets.KEY_PASSWORD }}
+
+      - name: Release APK
+        uses: ncipollo/release-action@v1
         with:
-          # these are secrets used by the upload-release-asset action
-          upload_url: https://uploads.github.com/repos/CrypticCortex/BubbleDiary/releases/12345/assets{?name,label}
-          asset_path: ./build/app/outputs/flutter-apk/app-release.apk
-          asset_name: app-release.apk
-          asset_content_type: application/octet-stream
+          artifacts: "build/app/outputs/flutter-apk/app-release.apk"
+          token: ${{ secrets.GITHUB_TOKEN }}
