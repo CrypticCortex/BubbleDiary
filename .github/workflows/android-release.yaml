@@ -23,10 +23,14 @@ jobs:
         with:
           flutter-version: "3.16.7"
 
-      - name: Setup JKS
-        env:
-          JKS_FILE: ${{ secrets.JKS_FILE }}
-        run: echo $JKS_FILE > ./key.jks
+      - name: Decode Keystore
+        run: echo "${{ secrets.KEYSTORE_FILE }}" | base64 --decode > ${{github.workspace}}/android/app/release.keystore
+      - name: Create Key Properties
+        run: |
+          echo "storePassword=${{ secrets.KEY_STORE_PASSWORD }}" > ${{github.workspace}}/android/key.properties
+          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> ${{github.workspace}}/android/key.properties
+          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> ${{github.workspace}}/android/key.properties
+          echo "storeFile=${{github.workspace}}/android/app/release.keystore" >> ${{github.workspace}}/android/key.properties
 
       - name: Get Packages
         run: flutter pub get
