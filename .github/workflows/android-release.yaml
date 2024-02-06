@@ -32,7 +32,7 @@ jobs:
         run: flutter pub get
 
       - name: Build APK
-        run: flutter build apk --split-per-abi --release --key-store-path=./key.jks --key-store-password=${{ secrets.KEY_STORE_PASSWORD }} --key-alias=${{ secrets.KEY_ALIAS }} --key-password=${{ secrets.KEY_PASSWORD }}
+        run: flutter build apk --split-per-abi --release --keystore-path=./key.jks --keystore-password=${{ secrets.KEY_STORE_PASSWORD }} --key-alias=${{ secrets.KEY_ALIAS }} --key-password=${{ secrets.KEY_PASSWORD }}
 
       - name: Release APK
         uses: ncipollo/release-action@v1
