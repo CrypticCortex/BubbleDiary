@@ -26,7 +26,7 @@ jobs:
       - name: Setup JKS
         env:
           JKS_FILE: ${{ secrets.JKS_FILE }}
-        run: echo $JKS_FILE | base64 --decode > ./key.jks
+        run: echo $JKS_FILE > ./key.jks
 
       - name: Get Packages
         run: flutter pub get
