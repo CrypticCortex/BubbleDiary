@@ -33,6 +33,9 @@ jobs:
           echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> ${{github.workspace}}/android/key.properties
           echo "storeFile=${{github.workspace}}/android/app/release.keystore" >> ${{github.workspace}}/android/key.properties
 
+      - name: Reading Key Properties
+        run: cat ${{github.workspace}}/android/key.properties
+
       - name: Get Packages
         run: flutter pub get
 
@@ -42,8 +45,7 @@ jobs:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
-          flutter build apk --split-per-abi --release --keystore-path=key.jks --keystore-password=${KEYSTORE_PASSWORD} --key-alias=${KEY_ALIAS} --key-password=${KEY_PASSWORD}
-
+          flutter build apk --split-per-abi --release
       - name: Release APK
         uses: ncipollo/release-action@v1
         with:
