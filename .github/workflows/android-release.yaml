@@ -1,4 +1,4 @@
-name: Flutter APK
+name: Flutter APK Release
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  build:
+  build-and-release:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -18,6 +18,11 @@ jobs:
           java-version: "17"
           distribution: "adopt"
 
+      - name: Copying google-services.json
+        run: |
+          mkdir -p android/app/src/main
+          echo "${{ secrets.GOOGLE_SERVICES_JSON }}" > ${{ github.workspace }}/android/app/src/main/google-services.json
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v1
         with:
@@ -26,15 +31,13 @@ jobs:
       - name: Decode Keystore
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > ${{ github.workspace }}/key.jks
+
       - name: Create Key Properties
         run: |
           echo "storePassword=${{ secrets.STOREPASSWORD }}" > ${{github.workspace}}/android/key.properties
           echo "keyPassword=${{ secrets.KEYPASSWORD }}" >> ${{github.workspace}}/android/key.properties
           echo "keyAlias=${{ secrets.KEYALIAS }}" >> ${{github.workspace}}/android/key.properties
           echo "storeFile=${{ github.workspace }}/key.jks" >> ${{github.workspace}}/android/key.properties
-
-      - name: Reading Key Properties
-        run: cat ${{github.workspace}}/android/key.properties
 
       - name: Get Packages
         run: flutter pub get
@@ -44,10 +47,42 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: flutter build apk --release
+
+      - name: Rename APK
+        run: mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/BubbleDiary.apk
+
+      - name: Generate Release Tag
+        id: tagger
         run: |
-          flutter build apk --split-per-abi --release
+          TAG_DATE=$(date +'%Y%m%d%H%M%S')
+          echo "RELEASE_TAG=v$TAG_DATE" >> $GITHUB_ENV
+          echo "::set-output name=tag::v$TAG_DATE"
+
+      - name: Create and Push Tag
+        run: |
+          git tag ${{ env.RELEASE_TAG }}
+          git push origin ${{ env.RELEASE_TAG }}
+
       - name: Release APK
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "build/app/outputs/flutter-apk/app-release.apk"
+          artifacts: build/app/outputs/flutter-apk/BubbleDiary.apk
           token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ steps.tagger.outputs.tag }}
+          generateReleaseNotes: false
+          makeLatest: legacy
+          omitBody: false
+          omitBodyDuringUpdate: false
+          omitDraftDuringUpdate: false
+          omitName: false
+          omitNameDuringUpdate: false
+          omitPrereleaseDuringUpdate: false
+          removeArtifacts: false
+          replacesArtifacts: true
+          skipIfReleaseExists: false
+          updateOnlyUnreleased: false
+        env:
+          JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/17.0.10-7/x64
+          FLUTTER_ROOT: /opt/hostedtoolcache/flutter/3.16.7-stable/x64
+          PUB_CACHE: /opt/hostedtoolcache/flutter/3.16.7-stable/x64/.pub-cache
