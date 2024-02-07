@@ -31,7 +31,7 @@ jobs:
           echo "storePassword=${{ secrets.KEY_STORE_PASSWORD }}" > ${{github.workspace}}/android/key.properties
           echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> ${{github.workspace}}/android/key.properties
           echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> ${{github.workspace}}/android/key.properties
-          echo "storeFile=${{github.workspace}}/android/app/release.keystore" >> ${{github.workspace}}/android/key.properties
+          echo "storeFile=${{ github.workspace }}/key.jks" >> ${{github.workspace}}/android/key.properties
 
       - name: Reading Key Properties
         run: cat ${{github.workspace}}/android/key.properties
