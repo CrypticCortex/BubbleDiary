@@ -2,6 +2,8 @@ name: Flutter APK Release
 
 on:
   push:
+    tags:
+      - "*apk*"
     branches:
       - master
 
