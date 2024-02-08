@@ -1,3 +1,5 @@
+Download the app from [here](https://github.com/CrypticCortex/BubbleDiary/releases).
+
 Diary app reImagined !
 Biometric Authenticated,Uniquely crafted Diary app which stores your daily dairies at cloud ( again secure :) ).
 
