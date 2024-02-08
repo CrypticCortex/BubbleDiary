@@ -88,6 +88,7 @@ class _LoginPageState extends State<LoginPage> {
               GestureDetector(
                 onTap: () {
                   _signIn();
+                  print('Login button pressed');
                 },
                 child: Container(
                   width: double.infinity,
@@ -181,12 +182,9 @@ class _LoginPageState extends State<LoginPage> {
 
     User? user = await _auth.signInWithEmailAndPassword(email, password);
 
-    setState(() {
-      _isSigning = false;
-    });
-
     if (user != null) {
-      showToast(message: "User is successfully signed in");
+      //showToast(message: "User is successfully signed in");
+      showToast(message: 'UserId is ${user.uid}');
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setBool('isLoggedIn', true);
 

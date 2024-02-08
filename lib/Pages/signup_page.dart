@@ -1,8 +1,10 @@
+import 'package:bubblediary/Home.dart';
 import 'package:bubblediary/Pages/bubble_lens_notes.dart';
 import 'package:bubblediary/Pages/forms.dart';
 import 'package:bubblediary/Pages/login_page.dart';
 import 'package:bubblediary/Services/auth_service.dart';
 import 'package:bubblediary/Utils/toast.dart';
+import 'package:bubblediary/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -47,7 +49,10 @@ class _SignUpPageState extends State<SignUpPage> {
             children: [
               const Text(
                 "Sign Up",
-                style: TextStyle(fontSize: 27, fontWeight: FontWeight.bold,fontFamily: 'Poppins'),
+                style: TextStyle(
+                    fontSize: 27,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Poppins'),
               ),
               const SizedBox(
                 height: 30,
@@ -123,7 +128,8 @@ class _SignUpPageState extends State<SignUpPage> {
                               "Sign Up",
                               style: TextStyle(
                                   color: Colors.white,
-                                  fontWeight: FontWeight.bold,fontFamily: 'Poppins'),
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Poppins'),
                             )),
                 ),
               ),
@@ -148,7 +154,9 @@ class _SignUpPageState extends State<SignUpPage> {
                       child: const Text(
                         "Login",
                         style: TextStyle(
-                            color: Colors.blue, fontWeight: FontWeight.bold,fontFamily: 'Poppins'),
+                            color: Colors.blue,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Poppins'),
                       ))
                 ],
               )
@@ -168,22 +176,20 @@ class _SignUpPageState extends State<SignUpPage> {
     String email = _emailController.text;
     String password = _passwordController.text;
 
-    User? user = await _auth.signUpWithEmailAndPassword(email, password);
+    User? user = await _auth.assignUsername(email, password, username);
 
-    setState(() {
-      isSigningUp = false;
-    });
     if (user != null) {
       showToast(message: "User is successfully created");
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setBool('isLoggedIn', false);
 
+      // ignore: use_build_context_synchronously
       Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => BubbleLensNotes()),
+          MaterialPageRoute(builder: (context) => MainPage()),
           (route) => false);
     } else {
-      showToast(message: "Some error happend");
+      showToast(message: "Some error happened");
     }
   }
 }

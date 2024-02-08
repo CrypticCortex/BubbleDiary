@@ -1,3 +1,4 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:bubblediary/Services/auth_status.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -39,7 +40,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       body: Container(
         width: size.width,
         height: size.height,
-        color: Theme.of(context).primaryColor,
+        color: Theme.of(context).backgroundColor,
         child: Padding(
           padding: const EdgeInsets.only(
               left: 16.0, right: 16.0, top: 50.0, bottom: 25.0),
@@ -54,7 +55,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   style: TextStyle(
                     fontSize: 35,
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).dividerColor,
+                    color: Theme.of(context).primaryColorLight,
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -62,7 +63,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   'Please enter your email address to recover your password.',
                   style: TextStyle(
                     fontSize: 15,
-                    color: Theme.of(context).dividerColor,
+                    color: Theme.of(context).primaryColorLight,
                   ),
                 ),
                 const SizedBox(height: 40),
@@ -86,10 +87,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                       return null;
                     },
                     autofocus: true,
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black),
+                        color: Theme.of(context).primaryColor),
                     decoration: InputDecoration(
                       contentPadding: const EdgeInsets.symmetric(
                           vertical: 20, horizontal: 20),
@@ -121,7 +122,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                       isDense: true,
                       // fillColor: kPrimaryColor,
                       filled: true,
-                      errorStyle: TextStyle(fontSize: 15),
+                      errorStyle: const TextStyle(fontSize: 15),
                       hintText: 'Email address',
                       hintStyle: TextStyle(
                           fontSize: 17,
@@ -137,13 +138,25 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   child: Material(
                     elevation: 2,
                     borderRadius: BorderRadius.circular(20),
-                    color: Theme.of(context).focusColor,
+                    color: Theme.of(context).primaryColorLight,
                     child: MaterialButton(
                       onPressed: () async {
                         if (_key.currentState!.validate()) {
                           final _status = await resetPassword(
                               email: _emailController.text.trim());
                           if (_status == AuthStatus.successful) {
+                            //show popup dialoug saying check mail
+                            // ignore: use_build_context_synchronously
+                            AwesomeDialog(
+                              context: context,
+                              dialogType: DialogType.success,
+                              animType: AnimType.scale,
+                              title: 'Success',
+                              desc: 'Check your email to reset your password',
+                              btnOkOnPress: () {
+                                Navigator.pop(context);
+                              },
+                            ).show();
                           } else {}
                         }
                       },
@@ -151,7 +164,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                       child: Text(
                         'RECOVER PASSWORD',
                         style: TextStyle(
-                            color: Theme.of(context).dividerColor,
+                            color: Theme.of(context).shadowColor,
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                             fontFamily: 'Poppins'),

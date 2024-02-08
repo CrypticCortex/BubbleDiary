@@ -11,4 +11,5 @@ class ThemeNotifier extends ChangeNotifier {
     _themeData = themeData;
     notifyListeners();
   }
+
 }

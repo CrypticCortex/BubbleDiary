@@ -1,5 +1,7 @@
 import 'package:bubblediary/Pages/ResetPassword.dart';
 import 'package:bubblediary/main.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
@@ -17,6 +19,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   late Future<bool> _isBiometricAuthOn;
   bool isDarkMode = false;
+  late SharedPreferences prefs;
 
   @override
   void initState() {
@@ -28,18 +31,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   _loadDarkModePreference() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      isDarkMode = prefs.getBool('isDarkMode') ?? false;
-    });
+    prefs = await SharedPreferences.getInstance();
+    if (prefs.getBool('isDarkMode') != null) {
+      setState(() {
+        isDarkMode = prefs.getBool('isDarkMode')!;
+      });
+      // Get the ThemeNotifier from the context
+      ThemeNotifier themeNotifier =
+          Provider.of<ThemeNotifier>(context, listen: false);
+      // Set the theme
+      themeNotifier.setTheme(isDarkMode ? ThemeData.dark() : ThemeData.light());
+    }
   }
 
-  _updateDarkModePreference(bool newValue) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setBool('isDarkMode', newValue);
-    setState(() {
-      isDarkMode = newValue;
-    });
+  _updatePrefs(bool isDarkMode) async {
+    prefs.setBool('isDarkMode', isDarkMode);
   }
 
   Future<void> _toggleBiometricAuth(bool value) async {
@@ -66,6 +72,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    String Username = FirebaseAuth.instance.currentUser!.displayName.toString();
     return WillPopScope(
         onWillPop: () async {
           // Handle the back button press here
@@ -83,8 +90,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           body: ListView(
             children: <Widget>[
+              Positioned(
+                right: 0,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    'Hi, $Username!',
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
               ListTile(
                 title: const Text('Biometric Authentication'),
+                leading: const Icon(Icons.fingerprint),
                 trailing: FutureBuilder<bool>(
                   future: _isBiometricAuthOn,
                   builder:
@@ -96,25 +117,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   },
                 ),
               ),
-              ListTile(
-                title: const Text('Dark Theme'),
-                trailing: Switch(
-                  value: isDarkMode,
-                  onChanged: (newValue) {
-                    // Get the ThemeNotifier from the context
-                    ThemeNotifier themeNotifier =
-                        Provider.of<ThemeNotifier>(context, listen: false);
+              // ListTile(
+              //   title: const Text('Dark Theme'),
+              //   trailing: Switch(
+              //     value: isDarkMode,
+              //     onChanged: (newValue) {
+              //       setState(() {
+              //         isDarkMode = newValue;
+              //       });
 
-                    _updateDarkModePreference(newValue);
-                    // Set the theme
-                    themeNotifier.setTheme(
-                        newValue ? ThemeData.dark() : ThemeData.light());
-                  },
-                ),
-              ),
+              //       ThemeNotifier themeNotifier =
+              //           Provider.of<ThemeNotifier>(context, listen: false);
+              //       // Set the theme
+              //       themeNotifier.setTheme(
+              //           isDarkMode ? ThemeData.dark() : ThemeData.light());
+              //       _updatePrefs(isDarkMode);
+              //     },
+              //   ),
+              // ),
               ListTile(
                 title: const Text('Change Password'),
-                trailing: const Icon(Icons.keyboard_arrow_right),
+                leading: const Icon(Icons.lock_outline),
                 onTap: () {
                   Navigator.push(
                     context,
@@ -125,9 +148,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               ListTile(
                 title: const Text('Logout'),
-                trailing: const Icon(Icons.keyboard_arrow_right),
+                leading: const Icon(Icons.logout),
                 onTap: () {
                   Navigator.pushReplacementNamed(context, '/logout');
+
+                  FirebaseAuth.instance.signOut();
 
                   _prefs.then((SharedPreferences prefs) {
                     prefs.clear();

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:bubblediary/Services/note_search.dart';
 import 'package:bubblediary/Services/notes_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:bubble_lens/bubble_lens.dart';
@@ -9,6 +10,10 @@ import 'package:provider/provider.dart';
 import '../Utils/Themenotifier.dart';
 
 class BubbleLensNotes extends StatelessWidget {
+  init() async {
+    print("Reached BubbleLensNotes");
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -18,12 +23,18 @@ class BubbleLensNotes extends StatelessWidget {
       child: Consumer<NotesProvider>(
         builder: (context, notesProvider, child) {
           final notes = notesProvider.notes;
+
+          final brightness = Theme.of(context).brightness;
+          final themeNotifier = Provider.of<ThemeNotifier>(context);
+
           return Scaffold(
             appBar: AppBar(
               automaticallyImplyLeading: false,
               centerTitle: true,
-              title: const Text('Your Personal Bubble Diary',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
+              title: const Text(
+                'Your Personal Bubble Diary',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               actions: <Widget>[
                 IconButton(
                   icon: Icon(Icons.search),
@@ -32,58 +43,91 @@ class BubbleLensNotes extends StatelessWidget {
                         context: context, delegate: NotesSearch(notes: notes));
                   },
                 ),
-                //PopupMenuButton<String>(
-                //  color: Theme.of(context).cardColor,
-                //  onSelected: (value) async {
-                //    if (value == 'Clear All') {
-                //      final confirm = await showDialog(
-                //        context: context,
-                //        builder: (BuildContext context) {
-                //          return AlertDialog(
-                //            title: const Text(
-                //                'Are you sure you want to delete all notes?'),
-                //            actions: <Widget>[
-                //              TextButton(
-                //                child: const Text("Cancel"),
-                //                onPressed: () {
-                //                  Navigator.of(context).pop(false);
-                //                },
-                //              ),
-                //              TextButton(
-                //                child: const Text("Yes"),
-                //                onPressed: () {
-                //                  Navigator.of(context).pop(true);
-                //                },
-                //              ),
-                //            ],
-                //          );
-                //        },
-                //      );
-                //      if (confirm) {
-                //        notesProvider.deleteAllNotes();
-                //      }
-                //    }
-                //    if (value == 'Settings') {
-                //      Navigator.pushNamed(context, '/settings');
-                //    }
-                //    if (value == 'Logout') {
-                //      Navigator.pushReplacementNamed(context, '/');
-                //    }
-                //  },
-                //  itemBuilder: (BuildContext context) =>
-                //      <PopupMenuEntry<String>>[
-                //    const PopupMenuItem<String>(
-                //      value: 'Clear All',
-                //      child: Text('Clear All'),
-                //    ),
-                //    const PopupMenuItem<String>(
-                //      value: 'Settings',
-                //      child: Text('Settings'),
-                //    ),
-                //  ],
-                //),
+                Consumer<ThemeNotifier>(
+                  builder: (_, themeNotifier, __) => IconButton(
+                    icon: Icon(
+                      Theme.of(context).brightness == Brightness.dark
+                          ? Icons.wb_sunny
+                          : Icons.nights_stay,
+                      color: Theme.of(context).primaryColorLight,
+                    ),
+                    onPressed: () {
+                      themeNotifier.setTheme(
+                        themeNotifier.getTheme().brightness == Brightness.dark
+                            ? ThemeData.light()
+                            : ThemeData.dark(),
+                      );
+                    },
+                  ),
+                ),
               ],
             ),
+
+            //appBar: AppBar(
+            //  automaticallyImplyLeading: false,
+            //  centerTitle: true,
+            //  title: const Text('Your Personal Bubble Diary',
+            //      style: TextStyle(fontWeight: FontWeight.bold)),
+            //  actions: <Widget>[
+            //    IconButton(
+            //      icon: Icon(Icons.search),
+            //      onPressed: () {
+            //        showSearch(
+            //            context: context, delegate: NotesSearch(notes: notes));
+            //      },
+            //    ),
+            //    //PopupMenuButton<String>(
+            //    //  color: Theme.of(context).cardColor,
+            //    //  onSelected: (value) async {
+            //    //    if (value == 'Clear All') {
+            //    //      final confirm = await showDialog(
+            //    //        context: context,
+            //    //        builder: (BuildContext context) {
+            //    //          return AlertDialog(
+            //    //            title: const Text(
+            //    //                'Are you sure you want to delete all notes?'),
+            //    //            actions: <Widget>[
+            //    //              TextButton(
+            //    //                child: const Text("Cancel"),
+            //    //                onPressed: () {
+            //    //                  Navigator.of(context).pop(false);
+            //    //                },
+            //    //              ),
+            //    //              TextButton(
+            //    //                child: const Text("Yes"),
+            //    //                onPressed: () {
+            //    //                  Navigator.of(context).pop(true);
+            //    //                },
+            //    //              ),
+            //    //            ],
+            //    //          );
+            //    //        },
+            //    //      );
+            //    //      if (confirm) {
+            //    //        notesProvider.deleteAllNotes();
+            //    //      }
+            //    //    }
+            //    //    if (value == 'Settings') {
+            //    //      Navigator.pushNamed(context, '/settings');
+            //    //    }
+            //    //    if (value == 'Logout') {
+            //    //      Navigator.pushReplacementNamed(context, '/');
+            //    //    }
+            //    //  },
+            //    //  itemBuilder: (BuildContext context) =>
+            //    //      <PopupMenuEntry<String>>[
+            //    //    const PopupMenuItem<String>(
+            //    //      value: 'Clear All',
+            //    //      child: Text('Clear All'),
+            //    //    ),
+            //    //    const PopupMenuItem<String>(
+            //    //      value: 'Settings',
+            //    //      child: Text('Settings'),
+            //    //    ),
+            //    //  ],
+            //    //),
+            //  ],
+            //),
             body: Container(
               padding: const EdgeInsets.all(10.0),
               height: MediaQuery.of(context).size.height,
@@ -93,6 +137,8 @@ class BubbleLensNotes extends StatelessWidget {
                 height: MediaQuery.of(context).size.height,
                 widgets: notes.map((note) {
                   String noteId = note.id;
+                  User? user = FirebaseAuth.instance.currentUser;
+                  String userID = user!.uid;
                   return GestureDetector(
                     onTap: () {
                       showDialog(
@@ -116,7 +162,7 @@ class BubbleLensNotes extends StatelessWidget {
                                       fontSize: 20,
                                       fontFamily: 'Poppins'),
                                 ),
-                                Text('${note.id}',
+                                Text('HI ${userID}',
                                     style: const TextStyle(
                                         color: Color.fromARGB(255, 89, 151, 69),
                                         fontFamily: 'Poppins'))

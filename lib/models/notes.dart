@@ -5,9 +5,11 @@ class Note {
   final DateTime dateCreated;
   final DateTime dateLastEdited;
   final String? category;
+  final String uid;
 
   Note(
-      {required this.id,
+      {required this.uid,
+        required this.id,
       required this.title,
       required this.content,
       required this.dateCreated,
@@ -21,12 +23,14 @@ class Note {
       'content': content,
       'dateCreated': dateCreated.millisecondsSinceEpoch,
       'dateLastEdited': dateLastEdited.millisecondsSinceEpoch,
-      'category': category
+      'category': category,
+      'uid' : uid,
     };
   }
 
   static Note fromMap(Map<String, dynamic> map) {
     return Note(
+      uid: map['uid'],
       id: map['id'],
       title: map['title'],
       content: map['content'],

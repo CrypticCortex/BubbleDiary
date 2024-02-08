@@ -1,14 +1,19 @@
 import 'package:bubblediary/models/notes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class DatabaseService {
   final FirebaseFirestore _firestore;
   final String _collectionName = 'notes';
+  final FirebaseAuth auth = FirebaseAuth.instance;
 
   DatabaseService(this._firestore);
 
   Future<void> addNote(Note note) async {
-    await _firestore.collection(_collectionName).add(note.toMap());
+    String uid = auth.currentUser!.uid;
+    await _firestore
+        .collection(_collectionName)
+        .add(note.toMap()..addAll({"userId": uid}));
   }
 
   Future<void> updateNote(Note note) async {
@@ -23,7 +28,13 @@ class DatabaseService {
   }
 
   Stream<List<Note>> notesStream() {
-    return _firestore.collection(_collectionName).snapshots().map((snapshot) {
+    String uid = auth.currentUser!.uid;
+    
+    return _firestore
+        .collection(_collectionName)
+        .where('userId', isEqualTo: uid)
+        .snapshots()
+        .map((snapshot) {
       return snapshot.docs.map((doc) => Note.fromMap(doc.data())).toList();
     });
   }

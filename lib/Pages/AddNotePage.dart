@@ -1,6 +1,7 @@
 import 'package:bubblediary/Services/notes_provider.dart';
 import 'package:bubblediary/models/notes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -14,16 +15,22 @@ class _AddNotePageState extends State<AddNotePage> {
   String _title = '';
   String _content = '';
   String _category = '';
+  String userId = FirebaseAuth.instance.currentUser!.uid;
 
   _submit() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
-      var newDocRef =
-          FirebaseFirestore.instance.collection('your_collection_name').doc();
+      var newNoteRef = FirebaseFirestore.instance
+          .collection('users') // main collection
+          .doc(userId) // each user has their own document
+          .collection(
+              'notes') // each user document has a subcollection of notes
+          .doc(); // generate note document reference
 
       Note newNote = Note(
-        id: newDocRef.id,
+        uid: userId,
+        id: newNoteRef.id,
         title: _title,
         content: _content,
         category: _category,

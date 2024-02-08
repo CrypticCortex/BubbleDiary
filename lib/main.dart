@@ -18,12 +18,12 @@ import 'package:firebase_core/firebase_core.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   SharedPreferences prefs = await SharedPreferences.getInstance();
+  bool isDarkMode = prefs.getBool('isDarkMode') ?? false;
   bool isBiometricAuthOn = prefs.getBool('isBiometricAuthOn') ?? false;
   bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-  Brightness deviceBrightness =
-      WidgetsBinding.instance.window.platformBrightness;
-  bool isDarkMode = deviceBrightness == Brightness.dark;
+
   if (isLoggedIn && isBiometricAuthOn) {
     LocalAuthentication auth = LocalAuthentication();
     bool didAuthenticate = await auth.authenticate(
@@ -31,11 +31,13 @@ Future<void> main() async {
     );
     isLoggedIn = didAuthenticate;
   }
+
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (_) => ThemeNotifier(ThemeData.light()),
+          create: (_) =>
+              ThemeNotifier(isDarkMode ? ThemeData.dark() : ThemeData.light()),
         ),
         ChangeNotifierProvider(
           create: (context) =>

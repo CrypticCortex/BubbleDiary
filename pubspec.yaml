@@ -51,6 +51,7 @@ dependencies:
   flutter_launcher_icons: ^0.13.1
   dynamic_color: ^1.6.9
   crystal_navigation_bar: ^1.0.0
+  awesome_dialog: ^3.2.0
 
 dev_dependencies:
   flutter_test:
