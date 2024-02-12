@@ -139,25 +139,31 @@ class _SignUpPageState extends State<SignUpPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text("Already have an account?"),
-                  const SizedBox(
-                    width: 5,
-                  ),
                   GestureDetector(
-                      onTap: () {
-                        Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const LoginPage()),
-                            (route) => false);
-                      },
+                    onTap: () {
+                      Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const LoginPage()),
+                          (route) => false);
+                    },
+                    child: Container(
+                      width: 150,
+                      height: 45,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                       child: const Text(
                         "Login",
                         style: TextStyle(
-                            color: Colors.blue,
+                            color: Colors.white,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'Poppins'),
-                      ))
+                      ),
+                    ),
+                  )
                 ],
               )
             ],

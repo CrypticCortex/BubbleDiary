@@ -118,10 +118,6 @@ class _LoginPageState extends State<LoginPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text("Don't have an account?"),
-                  const SizedBox(
-                    width: 5,
-                  ),
                   GestureDetector(
                     onTap: () {
                       Navigator.pushAndRemoveUntil(
@@ -131,21 +127,26 @@ class _LoginPageState extends State<LoginPage> {
                         (route) => false,
                       );
                     },
-                    child: const Text(
-                      "Sign Up",
-                      style: TextStyle(
-                          color: Colors.blue,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Poppins'),
+                    child: Container(
+                      width: 150,
+                      height: 45,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Text(
+                        "Sign up",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Poppins'),
+                      ),
                     ),
                   ),
                   const SizedBox(
                     width: 5,
-                    height: 20,
-                  ),
-                  const Text("Forgot Password?"),
-                  const SizedBox(
-                    width: 5,
+                    height: 5,
                   ),
                   GestureDetector(
                     onTap: () {
@@ -155,15 +156,32 @@ class _LoginPageState extends State<LoginPage> {
                             builder: (context) => const ResetPasswordScreen()),
                       );
                     },
-                    child: const Text(
-                      "Reset ",
-                      style: TextStyle(
-                          color: Colors.blue,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Poppins'),
+                    child: Container(
+                      width: 150,
+                      height: 45,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: Colors.redAccent,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Text(
+                        "Forget Password",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Poppins'),
+                      ),
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(
+                width: 5,
+                height: 20,
+              ),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [],
               ),
             ],
           ),
