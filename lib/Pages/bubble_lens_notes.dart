@@ -162,10 +162,6 @@ class BubbleLensNotes extends StatelessWidget {
                                       fontSize: 20,
                                       fontFamily: 'Poppins'),
                                 ),
-                                Text('HI ${userID}',
-                                    style: const TextStyle(
-                                        color: Color.fromARGB(255, 89, 151, 69),
-                                        fontFamily: 'Poppins'))
                               ],
                             ),
                             content: Text(note.content,

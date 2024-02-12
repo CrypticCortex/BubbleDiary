@@ -1,4 +1,5 @@
 import 'package:bubblediary/Pages/ResetPassword.dart';
+import 'package:bubblediary/Services/notes_provider.dart';
 import 'package:bubblediary/Utils/toast.dart';
 import 'package:bubblediary/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -167,6 +168,40 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   _prefs.then((SharedPreferences prefs) {
                     prefs.clear();
                   });
+                },
+              ),
+              ListTile(
+                title: Text('Clear All Notes'),
+                leading: Icon(Icons.dangerous),
+                onTap: () async {
+                  final confirm = await showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text(
+                            'Are you sure you want to delete all notes?'),
+                        actions: <Widget>[
+                          TextButton(
+                            child: const Text("Cancel"),
+                            onPressed: () {
+                              Navigator.of(context).pop(false);
+                            },
+                          ),
+                          TextButton(
+                            child: const Text("Yes"),
+                            onPressed: () {
+                              Navigator.of(context).pop(true);
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                  if (confirm != null && confirm) {
+                    // Call the deleteAllNotes() method from NotesProvider
+                    Provider.of<NotesProvider>(context, listen: false)
+                        .deleteAllNotes();
+                  }
                 },
               ),
             ],

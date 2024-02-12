@@ -29,7 +29,7 @@ class DatabaseService {
 
   Stream<List<Note>> notesStream() {
     String uid = auth.currentUser!.uid;
-    
+
     return _firestore
         .collection(_collectionName)
         .where('userId', isEqualTo: uid)
@@ -40,11 +40,18 @@ class DatabaseService {
   }
 
   Future<void> deleteAllNotes() async {
+    String uid = auth.currentUser!.uid;
+
     final batch = _firestore.batch();
-    final querySnapshot = await _firestore.collection(_collectionName).get();
+    final querySnapshot = await _firestore
+        .collection(_collectionName)
+        .where('userId', isEqualTo: uid)
+        .get();
+
     querySnapshot.docs.forEach((doc) {
       batch.delete(doc.reference);
     });
+
     await batch.commit();
   }
 }
