@@ -1,5 +1,8 @@
 # BubbleDiary
 
+![Thumbnail](https://github.com/CrypticCortex/BubbleDiary/assets/152802887/3205363b-f4a4-4cda-b57f-b45aba795964)
+
+
 Download the app from [here](https://github.com/CrypticCortex/BubbleDiary/releases).
 
 Diary app reImagined! Biometric Authenticated, Uniquely crafted Diary app which stores your daily dairies at cloud (again secure :)).
